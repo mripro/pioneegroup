@@ -1,3 +1,10 @@
+Google Admob Entry
+google.com, pub-9894660899681152, DIRECT, f08c47fec0942fa0
+
+
+
+
+Unity Ads Entry
 zmaticoo.com, 5135195, RESELLER
 loopme.com, 11463, RESELLER, 6c8d5f95897a5a3b
 loopme.com, 20775, RESELLER, 6c8d5f95897a5a3b
