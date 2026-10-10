@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIONEE Admin — Manage Site</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛠️</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070914;--surface:rgba(255,255,255,.05);--border:rgba(255,255,255,.1);--text:#eceffb;--muted:#96a0c4;--violet:#7c6cf6;--cyan:#3fe0dc;--pink:#f15fa0;--grad:linear-gradient(135deg,var(--violet),var(--cyan));--radius:16px;--radius-sm:10px;color-scheme:dark}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh}
+h1,h2,h3{font-family:'Space Grotesk',sans-serif}
+a{color:var(--cyan)}
+.glass{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);backdrop-filter:blur(14px)}
+.wrap{max-width:1180px;margin:0 auto;padding:26px 22px 80px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
+.logo-mark{width:36px;height:36px;border-radius:10px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#08070f;font-weight:700}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:100px;font-size:13.5px;font-weight:600;border:1px solid transparent;cursor:pointer;color:var(--text);background:transparent}
+.btn-primary{background:var(--grad);color:#08070f}
+.btn-ghost{border-color:var(--border)}
+.btn-danger{border-color:rgba(241,95,160,.5);color:var(--pink)}
+.btn-sm{padding:7px 13px;font-size:12.5px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 22px}
+.tab{padding:9px 16px;border-radius:100px;border:1px solid var(--border);font-size:13.5px;color:var(--muted);cursor:pointer;background:transparent}
+.tab.active{background:var(--grad);color:#08070f;border-color:transparent;font-weight:600}
+.panel{display:none}.panel.active{display:block}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px}
+.stat{padding:18px}.stat .n{font-size:26px;font-weight:700;font-family:'Space Grotesk'}.stat .l{font-size:12.5px;color:var(--muted);margin-top:4px}
+.card{padding:20px;margin-bottom:18px}
+.card h3{margin-bottom:12px;font-size:16px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--border);vertical-align:middle}
+th{color:var(--muted);font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+tr:hover td{background:rgba(255,255,255,.02)}
+.thumb{width:42px;height:42px;border-radius:10px;object-fit:cover;background:#11142a}
+.pill{display:inline-block;padding:3px 10px;border-radius:100px;font-size:11.5px;border:1px solid var(--border);color:var(--muted)}
+.pill.on{background:rgba(63,224,220,.15);color:var(--cyan);border-color:transparent}
+.pill.feat{background:rgba(124,108,246,.2);color:#cfc6ff;border-color:transparent}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.toolbar-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-bottom:14px}
+input,select,textarea{width:100%;padding:11px 13px;border-radius:var(--radius-sm);border:1px solid var(--border);background:#0b0e1f;color:var(--text);font-family:inherit;font-size:13.5px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--violet)}
+textarea{resize:vertical;min-height:70px}
+label{font-size:12.5px;color:var(--muted);display:block;margin:12px 0 6px}
+.form2{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
+@media(max-width:760px){.form2{grid-template-columns:1fr}}
+#login-view{max-width:420px;margin:12vh auto;padding:34px;text-align:center}
+#login-view input{margin-bottom:12px;text-align:left}
+.err{color:var(--pink);font-size:13px;margin-top:10px;min-height:18px}
+.modal-bg{position:fixed;inset:0;background:rgba(3,4,10,.75);display:none;align-items:flex-start;justify-content:center;z-index:50;overflow-y:auto;padding:34px 14px}
+.modal-bg.open{display:flex}
+.modal{max-width:760px;width:100%;padding:26px}
+.msg-list{display:grid;grid-template-columns:340px 1fr;gap:16px}
+@media(max-width:860px){.msg-list{grid-template-columns:1fr}}
+.msg-item{padding:12px;border-radius:12px;border:1px solid var(--border);margin-bottom:10px;cursor:pointer}
+.msg-item.unread{border-color:var(--violet);background:rgba(124,108,246,.08)}
+.msg-item.active{background:rgba(63,224,220,.08)}
+#toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,140%);background:#141832;border:1px solid var(--border);padding:12px 22px;border-radius:100px;font-size:13.5px;z-index:99;transition:transform .35s ease}
+#toast.show{transform:translate(-50%,0)}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.6}
+code{background:#0b0e1f;padding:2px 7px;border-radius:6px;font-size:12px}
+pre{background:#0b0e1f;border:1px solid var(--border);border-radius:12px;padding:14px;font-size:11.5px;overflow:auto;line-height:1.6;color:var(--muted)}
+.preview{width:100%;max-height:150px;object-fit:cover;border-radius:10px;margin-top:8px;display:none;border:1px solid var(--border)}
+.toggle{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:13.5px}
+.toggle input{width:auto;accent-color:var(--violet)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- LOGIN -->
+  <div id="login-view" class="glass">
+    <div class="logo" style="justify-content:center;margin-bottom:14px"><span class="logo-mark">P</span> PIONEE Admin</div>
+    <p class="hint" style="margin-bottom:18px">Sign in with your Firebase admin account to manage <code>Index.html</code>.</p>
+    <input type="email" id="login-email" placeholder="Admin email" autocomplete="username">
+    <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password">
+    <button class="btn btn-primary" id="btn-login" style="width:100%;justify-content:center">Sign In</button>
+    <div style="margin-top:12px"><a href="#" id="link-reset" style="font-size:12.5px">Forgot password?</a></div>
+    <div class="err" id="login-err"></div>
+    <p class="hint" style="margin-top:14px">First time? Create the user in <code>Firebase Console → Authentication → Add user</code>, then sign in here.</p>
+  </div>
+
+  <!-- APP -->
+  <div id="app-view" style="display:none">
+    <div class="topbar">
+      <div class="logo"><span class="logo-mark">P</span> PIONEE Admin <span class="pill" id="user-pill"></span></div>
+      <div class="row">
+        <a class="btn btn-ghost btn-sm" href="Index.html" target="_blank">View Site ↗</a>
+        <button class="btn btn-ghost btn-sm" id="btn-refresh">↻ Reload</button>
+        <button class="btn btn-danger btn-sm" id="btn-logout">Logout</button>
+      </div>
+    </div>
+
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-tab="dash">Dashboard</button>
+      <button class="tab" data-tab="apps">Apps</button>
+      <button class="tab" data-tab="cats">Categories</button>
+      <button class="tab" data-tab="settings">Site Settings</button>
+      <button class="tab" data-tab="msgs">Messages <span id="msg-badge"></span></button>
+      <button class="tab" data-tab="setup">Setup</button>
+    </div>
+
+    <!-- DASHBOARD -->
+    <section class="panel active" id="p-dash">
+      <div class="grid4">
+        <div class="stat glass"><div class="n" id="st-total">–</div><div class="l">Total apps</div></div>
+        <div class="stat glass"><div class="n" id="st-pub">–</div><div class="l">Published</div></div>
+        <div class="stat glass"><div class="n" id="st-views">–</div><div class="l">Total views</div></div>
+        <div class="stat glass"><div class="n" id="st-msg">–</div><div class="l">Unread messages</div></div>
+      </div>
+      <div class="card glass"><h3>Quick actions</h3>
+        <div class="row">
+          <button class="btn btn-primary btn-sm" data-goto="apps" id="qa-app">+ New App</button>
+          <button class="btn btn-ghost btn-sm" data-goto="cats">+ New Category</button>
+          <button class="btn btn-ghost btn-sm" data-goto="settings">Edit Homepage Text</button>
+          <button class="btn btn-ghost btn-sm" data-goto="msgs">Open Inbox</button>
+        </div>
+      </div>
+      <div class="card glass"><h3>Most viewed apps</h3><div id="top-apps" class="hint">Loading…</div></div>
+    </section>
+
+    <!-- APPS -->
+    <section class="panel" id="p-apps">
+      <div class="card glass">
+        <div class="toolbar-row">
+          <div class="row" style="flex:1;min-width:240px">
+            <input id="app-search" placeholder="Search apps…" style="max-width:260px">
+            <select id="app-filter" style="max-width:200px"><option value="all">All</option><option value="pub">Published</option><option value="draft">Drafts</option><option value="feat">Featured</option></select>
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-new-app">+ New App</button>
+        </div>
+        <div style="overflow-x:auto"><table><thead><tr><th>App</th><th>Category</th><th>Rating</th><th>Views</th><th>Status</th><th></th></tr></thead><tbody id="apps-tbody"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- CATEGORIES -->
+    <section class="panel" id="p-cats">
+      <div class="card glass"><h3>Add / edit category</h3>
+        <div class="form2">
+          <div><label>Name</label><input id="cat-name" placeholder="e.g. AI Apps"></div>
+          <div><label>Icon (emoji)</label><input id="cat-icon" placeholder="e.g. 🤖"></div>
+        </div>
+        <div class="row" style="margin-top:14px">
+          <button class="btn btn-primary btn-sm" id="btn-save-cat">Save Category</button>
+          <button class="btn btn-ghost btn-sm" id="btn-cancel-cat" style="display:none">Cancel</button>
+        </div>
+      </div>
+      <div class="card glass"><h3>All categories</h3><div style="overflow-x:auto"><table><thead><tr><th>Icon</th><th>Name</th><th>Apps</th><th>ID</th><th></th></tr></thead><tbody id="cats-tbody"></tbody></table></div></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="panel" id="p-settings">
+      <div class="card glass"><h3>Brand & contact</h3>
+        <div class="form2">
+          <div><label>Developer name (navbar / footer / title)</label><input id="s-developerName"></div>
+          <div><label>About name (big heading)</label><input id="s-aboutName"></div>
+          <div><label>Email</label><input id="s-email" type="email"></div>
+          <div><label>Phone</label><input id="s-phone"></div>
+          <div style="grid-column:1/-1"><label>Google Play developer URL</label><input id="s-googlePlayUrl" placeholder="https://play.google.com/store/apps/dev?id=..."></div>
+        </div>
+      </div>
+      <div class="card glass"><h3>Hero section</h3>
+        <div class="form2">
+          <div><label>Hero badge</label><input id="s-heroBadge"></div>
+          <div><label>Hero photo URL (circle portrait)</label><input id="s-heroPhotoUrl" placeholder="https://…"></div>
+          <div style="grid-column:1/-1"><label>Hero heading</label><input id="s-heroHeading"></div>
+          <div style="grid-column:1/-1"><label>Hero description</label><textarea id="s-heroDescription" style="min-height:60px"></textarea></div>
+          <div><label>Floating chip 1</label><input id="s-chip1"></div>
+          <div><label>Floating chip 2</label><input id="s-chip2"></div>
+          <div><label>Floating chip 3</label><input id="s-chip3"></div>
+          <div><label>Floating chip 4</label><input id="s-chip4"></div>
+        </div>
+        <img class="preview" id="pv-hero" alt="">
+      </div>
+      <div class="card glass"><h3>Section titles & about</h3>
+        <div class="form2">
+          <div><label>Apps title</label><input id="s-appsTitle"></div>
+          <div><label>Apps subtitle</label><input id="s-appsSubtitle"></div>
+          <div><label>Categories title</label><input id="s-categoriesTitle"></div>
+          <div><label>Categories subtitle</label><input id="s-categoriesSubtitle"></div>
+          <div><label>Contact title</label><input id="s-contactTitle"></div>
+          <div><label>Contact subtitle</label><input id="s-contactSubtitle"></div>
+          <div style="grid-column:1/-1"><label>Footer tagline</label><input id="s-footerTagline"></div>
+          <div style="grid-column:1/-1"><label>Bio</label><textarea id="s-bio"></textarea></div>
+          <div><label>Tech badges (one per line)</label><textarea id="s-techBadges"></textarea></div>
+          <div><label>About photo URL</label><input id="s-profileImageUrl" placeholder="https://…"><img class="preview" id="pv-about" alt=""></div>
+        </div>
+      </div>
+      <div class="card glass"><h3>Social links (leave blank to hide)</h3>
+        <div class="form2">
+          <div><label>LinkedIn</label><input id="s-linkedin"></div>
+          <div><label>Facebook</label><input id="s-facebook"></div>
+          <div><label>Instagram</label><input id="s-instagram"></div>
+          <div><label>YouTube</label><input id="s-youtube"></div>
+        </div>
+        <div class="row" style="margin-top:16px">
+          <button class="btn btn-primary" id="btn-save-settings">Save Settings</button>
+          <span class="hint" id="settings-status"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- MESSAGES -->
+    <section class="panel" id="p-msgs">
+      <div class="card glass">
+        <div class="toolbar-row">
+          <div class="row"><select id="msg-filter" style="max-width:180px"><option value="all">All messages</option><option value="unread">Unread only</option></select></div>
+          <span class="hint" id="msg-count"></span>
+        </div>
+        <div class="msg-list">
+          <div id="msg-items"></div>
+          <div id="msg-detail" class="glass" style="padding:18px;border-radius:12px"><p class="hint">Select a message to read it.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETUP -->
+    <section class="panel" id="p-setup">
+      <div class="card glass"><h3>1) Enable Email/Password auth</h3>
+        <p class="hint">Firebase Console → Authentication → Sign-in method → enable <code>Email/Password</code> → Users → Add user (your admin email + password). Then sign in on this page.</p></div>
+      <div class="card glass"><h3>2) Firestore security rules</h3>
+        <p class="hint" style="margin-bottom:10px">Firebase Console → Firestore → Rules → paste this, then Publish:</p>
+<pre>rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+    match /settings/{doc} { allow read: if true; allow write: if request.auth != null; }
+    match /categories/{doc} { allow read: if true; allow write: if request.auth != null; }
+    match /apps/{doc} { allow read: if true; allow write: if request.auth != null; }
+    match /messages/{doc} { allow create: if true; allow read, update, delete: if request.auth != null; }
+  }
+}</pre></div>
+      <div class="card glass"><h3>3) Seed demo data (optional)</h3>
+        <p class="hint" style="margin-bottom:10px">If Firestore is empty, one click copies the demo categories/apps from Index.html into the cloud.</p>
+        <div class="row"><button class="btn btn-ghost btn-sm" id="btn-seed">Seed demos if empty</button><span class="hint" id="seed-status"></span></div></div>
+    </section>
+  </div>
+</div>
+
+<!-- APP MODAL -->
+<div class="modal-bg" id="app-modal-bg">
+  <div class="modal glass">
+    <h3 id="app-modal-title">New App</h3>
+    <div class="form2">
+      <div><label>App name *</label><input id="f-name"></div>
+      <div><label>Category *</label><select id="f-category"></select></div>
+      <div style="grid-column:1/-1"><label>Short description (card)</label><input id="f-short"></div>
+      <div style="grid-column:1/-1"><label>Full description</label><textarea id="f-desc"></textarea></div>
+      <div><label>Icon image URL *</label><input id="f-icon" placeholder="https://…"></div>
+      <div><label>Main / cover image URL</label><input id="f-main" placeholder="https://…"></div>
+      <div style="grid-column:1/-1"><label>Screenshots (one URL per line)</label><textarea id="f-shots"></textarea></div>
+      <div><label>Rating (0–5)</label><input id="f-rating" type="number" step="0.1" min="0" max="5"></div>
+      <div><label>Downloads label (e.g. 50K+)</label><input id="f-downloads"></div>
+      <div><label>Version</label><input id="f-version"></div>
+      <div><label>Last updated</label><input id="f-updated" placeholder="Sep 2026"></div>
+      <div style="grid-column:1/-1"><label>Google Play URL</label><input id="f-play" placeholder="https://play.google.com/…"></div>
+      <div style="grid-column:1/-1"><label>Features (one per line)</label><textarea id="f-features"></textarea></div>
+      <div style="grid-column:1/-1"><label>Technologies (one per line or comma)</label><textarea id="f-tech"></textarea></div>
+    </div>
+    <div class="row">
+      <label class="toggle"><input type="checkbox" id="f-featured"> Featured (pinned on top)</label>
+      <label class="toggle"><input type="checkbox" id="f-published" checked> Published (visible on site)</label>
+    </div>
+    <div class="row" style="margin-top:18px">
+      <button class="btn btn-primary" id="btn-save-app">Save App</button>
+      <button class="btn btn-ghost" id="btn-close-app">Cancel</button>
+      <span class="hint" id="app-err"></span>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script>
+/* Same config as Index.html */
+const firebaseConfig = {
+  apiKey: "AIzaSyAO2zVKnIY-co_3tQaEoP88C6dyRq1-CFw",
+  authDomain: "play-8473e.firebaseapp.com",
+  projectId: "play-8473e",
+  storageBucket: "play-8473e.firebasestorage.app",
+  messagingSenderId: "563771537147",
+  appId: "1:563771537147:web:c09f9668441b048ed1225e",
+  measurementId: "G-RSMDSH2C51"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const $ = (id)=>document.getElementById(id);
+const esc = (s)=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const lines = (t)=>String(t||"").split("\n").map(s=>s.trim()).filter(Boolean);
+function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2600); }
+
+let APPS=[], CATS=[], MSGS=[], SETTINGS={}, editingAppId=null, editingCatId=null, activeMsgId=null;
+
+/* ---------- AUTH ---------- */
+$("btn-login").onclick = async ()=>{
+  $("login-err").textContent="";
+  try{ await auth.signInWithEmailAndPassword($("login-email").value.trim(), $("login-pass").value); }
+  catch(e){ $("login-err").textContent = e.message; }
+};
+$("link-reset").onclick = async (e)=>{ e.preventDefault(); const em=$("login-email").value.trim(); if(!em) return $("login-err").textContent="Enter your email first."; try{ await auth.sendPasswordResetEmail(em); toast("Reset email sent"); }catch(err){ $("login-err").textContent=err.message; } };
+$("btn-logout").onclick = ()=>auth.signOut();
+auth.onAuthStateChanged(u=>{
+  const logged = !!u;
+  $("login-view").style.display = logged?"none":"block";
+  $("app-view").style.display = logged?"block":"none";
+  if(logged){ $("user-pill").textContent = u.email; loadAll(); }
+});
+
+/* ---------- TABS ---------- */
+document.querySelectorAll("#tabs .tab").forEach(b=>b.onclick=()=>gotoTab(b.dataset.tab));
+document.querySelectorAll("[data-goto]").forEach(b=>b.onclick=()=>gotoTab(b.dataset.goto));
+function gotoTab(name){
+  document.querySelectorAll("#tabs .tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===name));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  $("p-"+name).classList.add("active");
+}
+$("btn-refresh").onclick = loadAll;
+
+/* ---------- LOAD ---------- */
+async function loadAll(){
+  const [sSnap,cSnap,aSnap,mSnap] = await Promise.all([
+    db.collection("settings").doc("site").get(),
+    db.collection("categories").get(),
+    db.collection("apps").get(),
+    db.collection("messages").get()
+  ]);
+  SETTINGS = sSnap.exists ? sSnap.data() : {};
+  CATS = cSnap.docs.map(d=>({id:d.id,...d.data()}));
+  APPS = aSnap.docs.map(d=>({id:d.id,...d.data()}));
+  MSGS = mSnap.docs.map(d=>({id:d.id,...d.data()}))
+    .sort((a,b)=>String(b.createdAt||"").localeCompare(String(a.createdAt||"")));
+  renderDash(); renderApps(); renderCats(); fillSettings(); renderMsgs();
+}
+
+/* ---------- DASHBOARD ---------- */
+function renderDash(){
+  const pub = APPS.filter(a=>a.published);
+  $("st-total").textContent = APPS.length;
+  $("st-pub").textContent = pub.length;
+  $("st-views").textContent = APPS.reduce((s,a)=>s+(Number(a.views)||0),0).toLocaleString();
+  const unread = MSGS.filter(m=>!m.read).length;
+  $("st-msg").textContent = MSGS.length + (unread?(" ("+unread+" new)"): "");
+  $("msg-badge").textContent = unread?("("+unread+")"):"";
+  const top=[...APPS].sort((a,b)=>(b.views||0)-(a.views||0)).slice(0,5);
+  $("top-apps").innerHTML = top.length? top.map(a=>`<div style="padding:8px 0;border-bottom:1px solid var(--border)">${esc(a.name)} — <b>${Number(a.views||0).toLocaleString()}</b> views ${a.published?"":"(draft)"}</div>`).join("") : "No apps yet.";
+}
+
+/* ---------- APPS ---------- */
+function catName(id){ return (CATS.find(c=>c.id===id)||{}).name || id || "—"; }
+function renderApps(){
+  const q = $("app-search").value.trim().toLowerCase(), f = $("app-filter").value;
+  let list = APPS.filter(a=>{
+    if(f==="pub" && !a.published) return false;
+    if(f==="draft" && a.published) return false;
+    if(f==="feat" && !a.featured) return false;
+    return !q || (a.name+" "+(a.shortDescription||"")).toLowerCase().includes(q);
+  }).sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+  $("apps-tbody").innerHTML = list.length? list.map(a=>`<tr>
+    <td><div class="row"><img class="thumb" src="${esc(a.iconUrl||"")}" onerror="this.style.opacity=.2" alt=""><div><b>${esc(a.name)}</b><div class="hint">${esc(a.shortDescription||"").slice(0,60)}</div></div></div></td>
+    <td>${esc(catName(a.categoryId))}</td><td>★ ${esc(a.rating==null?"–":a.rating)}</td><td>${Number(a.views||0).toLocaleString()}</td>
+    <td><span class="pill ${a.published?"on":""}">${a.published?"live":"draft"}</span> ${a.featured?'<span class="pill feat">★ feat</span>':""}</td>
+    <td><div class="row"><button class="btn btn-ghost btn-sm" onclick="editApp('${a.id}')">Edit</button><button class="btn btn-ghost btn-sm" onclick="togglePub('${a.id}')">${a.published?"Unpublish":"Publish"}</button><button class="btn btn-danger btn-sm" onclick="delApp('${a.id}')">Delete</button></div></td>
+  </tr>`).join("") : `<tr><td colspan="6" class="hint" style="text-align:center;padding:24px">No apps found. Click “+ New App”.</td></tr>`;
+  $("f-category").innerHTML = CATS.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("") || `<option value="">— create a category first —</option>`;
+}
+$("app-search").oninput = renderApps; $("app-filter").onchange = renderApps;
+$("btn-new-app").onclick = ()=>openAppModal(null);
+$("btn-close-app").onclick = ()=>$("app-modal-bg").classList.remove("open");
+function openAppModal(id){
+  editingAppId = id;
+  $("app-modal-title").textContent = id?"Edit App":"New App";
+  $("app-err").textContent="";
+  const a = APPS.find(x=>x.id===id)||{};
+  $("f-name").value=a.name||""; $("f-category").value=a.categoryId||($("f-category").options[0]?$("f-category").options[0].value:"");
+  $("f-short").value=a.shortDescription||""; $("f-desc").value=a.description||"";
+  $("f-icon").value=a.iconUrl||""; $("f-main").value=a.mainImageUrl||"";
+  $("f-shots").value=(a.screenshots||[]).join("\n"); $("f-rating").value=(a.rating==null?"":a.rating);
+  $("f-downloads").value=a.downloads||""; $("f-version").value=a.version||"";
+  $("f-updated").value=a.lastUpdated||""; $("f-play").value=a.googlePlayUrl||"";
+  $("f-features").value=(a.features||[]).join("\n");
+  $("f-tech").value=(a.technologies||[]).join("\n");
+  $("f-featured").checked=!!a.featured; $("f-published").checked=(a.published!==false);
+  $("app-modal-bg").classList.add("open");
+}
+window.editApp = (id)=>openAppModal(id);
+window.togglePub = async (id)=>{ const a=APPS.find(x=>x.id===id); await db.collection("apps").doc(id).update({published:!a.published}); toast(a.published?"Unpublished":"Published"); loadAll(); };
+window.delApp = async (id)=>{ const a=APPS.find(x=>x.id===id); if(!confirm(`Delete “${a.name}”? This cannot be undone.`)) return; await db.collection("apps").doc(id).delete(); toast("App deleted"); loadAll(); };
+$("btn-save-app").onclick = async ()=>{
+  const name=$("f-name").value.trim(), icon=$("f-icon").value.trim(), cat=$("f-category").value;
+  if(!name) return $("app-err").textContent="Name is required.";
+  if(!cat) return $("app-err").textContent="Create a category first (Categories tab).";
+  if(!icon) return $("app-err").textContent="Icon image URL is required.";
+  const techRaw=$("f-tech").value;
+  const data={ name, categoryId:cat, shortDescription:$("f-short").value.trim(), description:$("f-desc").value.trim(),
+    iconUrl:icon, mainImageUrl:$("f-main").value.trim()||icon, screenshots:lines($("f-shots").value),
+    rating:parseFloat($("f-rating").value)||0, downloads:$("f-downloads").value.trim(),
+    version:$("f-version").value.trim(), lastUpdated:$("f-updated").value.trim(),
+    googlePlayUrl:$("f-play").value.trim(), features:lines($("f-features").value),
+    technologies: techRaw.includes("\n")?lines(techRaw):techRaw.split(",").map(s=>s.trim()).filter(Boolean),
+    featured:$("f-featured").checked, published:$("f-published").checked, developer:SETTINGS.developerName||"PIONEE GROUP" };
+  try{
+    if(editingAppId) await db.collection("apps").doc(editingAppId).update(data);
+    else await db.collection("apps").add({...data,views:0,createdAt:new Date().toISOString()});
+    $("app-modal-bg").classList.remove("open"); toast("App saved ✓"); loadAll();
+  }catch(e){ $("app-err").textContent=e.message; }
+};
+
+/* ---------- CATEGORIES ---------- */
+function renderCats(){
+  const counts={}; APPS.forEach(a=>counts[a.categoryId]=(counts[a.categoryId]||0)+1);
+  $("cats-tbody").innerHTML = CATS.length? CATS.map(c=>`<tr><td style="font-size:20px">${esc(c.icon||"📁")}</td><td><b>${esc(c.name)}</b></td><td>${counts[c.id]||0} apps</td><td><code>${c.id}</code></td>
+  <td><div class="row"><button class="btn btn-ghost btn-sm" onclick="editCat('${c.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="delCat('${c.id}')">Delete</button></div></td></tr>`).join("")
+  : `<tr><td colspan="5" class="hint" style="text-align:center;padding:24px">No categories yet.</td></tr>`;
+}
+window.editCat = (id)=>{ const c=CATS.find(x=>x.id===id); editingCatId=id; $("cat-name").value=c.name||""; $("cat-icon").value=c.icon||""; $("btn-cancel-cat").style.display=""; };
+window.delCat = async (id)=>{ const n=APPS.filter(a=>a.categoryId===id).length; if(n && !confirm(`${n} app(s) use this category. Delete anyway? (apps will show raw id)`)) return; await db.collection("categories").doc(id).delete(); toast("Category deleted"); loadAll(); };
+$("btn-cancel-cat").onclick = ()=>{ editingCatId=null; $("cat-name").value=""; $("cat-icon").value=""; $("btn-cancel-cat").style.display="none"; };
+$("btn-save-cat").onclick = async ()=>{
+  const name=$("cat-name").value.trim(); if(!name) return toast("Category name required");
+  const data={name, icon:$("cat-icon").value.trim()||"📁"};
+  if(editingCatId) await db.collection("categories").doc(editingCatId).update(data);
+  else await db.collection("categories").add(data);
+  editingCatId=null; $("cat-name").value=""; $("cat-icon").value=""; $("btn-cancel-cat").style.display="none";
+  toast("Category saved ✓"); loadAll();
+};
+
+/* ---------- SETTINGS ---------- */
+const S = (id)=>$(id).value.trim();
+function fillSettings(){
+  const g=(k,d)=>SETTINGS[k]!=null?SETTINGS[k]:d;
+  $("s-developerName").value=g("developerName",""); $("s-aboutName").value=g("aboutName","");
+  $("s-email").value=g("email",""); $("s-phone").value=g("phone",""); $("s-googlePlayUrl").value=g("googlePlayUrl","");
+  $("s-heroBadge").value=g("heroBadge",""); $("s-heroHeading").value=g("heroHeading",""); $("s-heroDescription").value=g("heroDescription","");
+  $("s-heroPhotoUrl").value=g("heroPhotoUrl","");
+  const chips=g("heroChips",[]); for(let i=0;i<4;i++) $("s-chip"+(i+1)).value=chips[i]||"";
+  $("s-appsTitle").value=g("appsTitle",""); $("s-appsSubtitle").value=g("appsSubtitle","");
+  $("s-categoriesTitle").value=g("categoriesTitle",""); $("s-categoriesSubtitle").value=g("categoriesSubtitle","");
+  $("s-contactTitle").value=g("contactTitle",""); $("s-contactSubtitle").value=g("contactSubtitle","");
+  $("s-footerTagline").value=g("footerTagline",""); $("s-bio").value=g("bio","");
+  $("s-techBadges").value=(g("techBadges",[])||[]).join("\n");
+  $("s-profileImageUrl").value=g("profileImageUrl","");
+  $("s-linkedin").value=g("linkedin",""); $("s-facebook").value=g("facebook","");
+  $("s-instagram").value=g("instagram",""); $("s-youtube").value=g("youtube","");
+  pv("pv-hero",$("s-heroPhotoUrl").value); pv("pv-about",$("s-profileImageUrl").value);
+}
+function pv(id,url){ const el=$(id); if(url && url.startsWith("http")){ el.src=url; el.style.display="block"; } else el.style.display="none"; }
+$("s-heroPhotoUrl").oninput=e=>pv("pv-hero",e.target.value);
+$("s-profileImageUrl").oninput=e=>pv("pv-about",e.target.value);
+$("btn-save-settings").onclick = async ()=>{
+  $("settings-status").textContent="Saving…";
+  const data={ developerName:S("s-developerName"), aboutName:S("s-aboutName"), email:S("s-email"), phone:S("s-phone"), googlePlayUrl:S("s-googlePlayUrl"),
+    heroBadge:S("s-heroBadge"), heroHeading:S("s-heroHeading"), heroDescription:S("s-heroDescription"), heroPhotoUrl:S("s-heroPhotoUrl"),
+    heroChips:[S("s-chip1"),S("s-chip2"),S("s-chip3"),S("s-chip4")].filter(Boolean),
+    appsTitle:S("s-appsTitle"), appsSubtitle:S("s-appsSubtitle"), categoriesTitle:S("s-categoriesTitle"), categoriesSubtitle:S("s-categoriesSubtitle"),
+    contactTitle:S("s-contactTitle"), contactSubtitle:S("s-contactSubtitle"), footerTagline:S("s-footerTagline"),
+    bio:S("s-bio"), techBadges:lines($("s-techBadges").value), profileImageUrl:S("s-profileImageUrl"),
+    linkedin:S("s-linkedin"), facebook:S("s-facebook"), instagram:S("s-instagram"), youtube:S("s-youtube") };
+  try{ await db.collection("settings").doc("site").set(data,{merge:true}); SETTINGS={...SETTINGS,...data}; $("settings-status").textContent="Saved ✓ — refresh Index.html to see it."; toast("Settings saved ✓"); }
+  catch(e){ $("settings-status").textContent=e.message; }
+};
+
+/* ---------- MESSAGES ---------- */
+function renderMsgs(){
+  const f=$("msg-filter").value;
+  const list=MSGS.filter(m=>f==="all"||!m.read);
+  $("msg-count").textContent=list.length+" message(s)";
+  $("msg-items").innerHTML = list.length? list.map(m=>`<div class="msg-item ${!m.read?"unread":""} ${m.id===activeMsgId?"active":""}" onclick="openMsg('${m.id}')">
+    <b>${esc(m.name||"—")}</b> <span class="hint">· ${esc(m.createdAt?String(m.createdAt).slice(0,10):"")}</span>
+    <div style="font-size:13px;margin-top:4px">${esc(m.subject||"(no subject)")}</div>
+    <div class="hint" style="margin-top:4px">${esc(String(m.message||"").slice(0,80))}…</div></div>`).join("")
+    : `<p class="hint">No messages.</p>`;
+  if(activeMsgId) openMsg(activeMsgId,true);
+}
+$("msg-filter").onchange = renderMsgs;
+window.openMsg = async (id,soft)=>{
+  const m=MSGS.find(x=>x.id===id); if(!m) return; activeMsgId=id;
+  document.querySelectorAll(".msg-item").forEach(el=>el.classList.remove("active"));
+  $("msg-detail").innerHTML=`<h3>${esc(m.subject||"(no subject)")}</h3>
+    <p class="hint" style="margin:8px 0">From <b style="color:var(--text)">${esc(m.name)}</b> · <a href="mailto:${esc(m.email)}">${esc(m.email)}</a> · ${esc(m.createdAt||"")}</p>
+    <p style="line-height:1.7;font-size:14px;margin:12px 0">${esc(m.message).replace(/\n/g,"<br>")}</p>
+    <div class="row"><a class="btn btn-primary btn-sm" href="mailto:${esc(m.email)}?subject=${encodeURIComponent("Re: "+(m.subject||""))}">Reply</a>
+    <button class="btn btn-ghost btn-sm" onclick="toggleRead('${m.id}')">${m.read?"Mark unread":"Mark read"}</button>
+    <button class="btn btn-danger btn-sm" onclick="delMsg('${m.id}')">Delete</button></div>`;
+  if(!soft) renderMsgsSilentActive();
+  if(!m.read){ await db.collection("messages").doc(id).update({read:true}); m.read=true; renderDash(); }
+};
+function renderMsgsSilentActive(){ document.querySelectorAll(".msg-item").forEach(()=>{}); }
+window.toggleRead = async (id)=>{ const m=MSGS.find(x=>x.id===id); await db.collection("messages").doc(id).update({read:!m.read}); m.read=!m.read; renderMsgs(); renderDash(); };
+window.delMsg = async (id)=>{ if(!confirm("Delete this message?")) return; await db.collection("messages").doc(id).delete(); MSGS=MSGS.filter(m=>m.id!==id); activeMsgId=null; $("msg-detail").innerHTML=`<p class="hint">Select a message to read it.</p>`; renderMsgs(); renderDash(); toast("Deleted"); };
+
+/* ---------- SEED ---------- */
+$("btn-seed").onclick = async ()=>{
+  $("seed-status").textContent="Working…";
+  try{
+    if(!CATS.length){
+      const demo=[{name:"AI Apps",icon:"🤖"},{name:"Productivity",icon:"⚡"},{name:"Finance",icon:"💳"},{name:"Utilities",icon:"🛠️"},{name:"Tools",icon:"🔧"}];
+      for(const c of demo) await db.collection("categories").add(c);
+    }
+    if(!Object.keys(SETTINGS).length){
+      await db.collection("settings").doc("site").set({developerName:"PIONEE GROUP",aboutName:"MRITYUNJOY BAGDI",email:"pioneegroup@gmail.com",phone:"+91 98515 29795",googlePlayUrl:"https://play.google.com/store/apps/dev?id=YOUR_DEV_ID",linkedin:"https://linkedin.com/in/mrityunjoyinfo",heroBadge:"Android Developer • Google Play Publisher",heroHeading:"Building smart Android apps for the real world",heroDescription:"Discover a collection of useful, innovative and AI-powered Android applications.",heroChips:["🤖 AI‑powered","⭐ 4.7 avg rating","{ } Kotlin","🔥 Firebase"],appsTitle:"Explore my latest Android applications",categoriesTitle:"Find apps by what they solve",categoriesSubtitle:"Every app is grouped so you can jump straight to what you need.",contactTitle:"Let's talk about your next app",footerTagline:"AI-powered Android applications built for productivity, utility and everyday life.",bio:"I build useful Android applications focused on productivity, AI, utilities and everyday digital solutions.",techBadges:["Android","Kotlin","Firebase","AI","React","JavaScript","UI/UX"]},{merge:true});
+    }
+    $("seed-status").textContent="Done ✓"; toast("Seeded ✓"); loadAll();
+  }catch(e){ $("seed-status").textContent=e.message; }
+};
+</script>
+</body>
+</html>
